@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="yathzeeicon.png">
+    <title>Yahtzee</title>
+  
+</head>
+
+
+<body>
+  
+  <h1> Welcome to the game of Yathzee!</h1>
+  <p> <a href ="rules.html">Rules</a> </p>
+
+    
+      <div class="square-container">
+        <div class="rounded-square">      
+          <div class="table-container">
+            <table>
+              <tr>
+              <th colspan="2">Upper Section</th>
+              </tr> 
+              <tr>
+              <th>Ones</th>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <th>Twos</th>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <th>Threes</th>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <th>Fours</th>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <th>Fives</th>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <th>Sixes</th>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <th>Upper Section Total</th>
+              <td id="upperTotal"></td>
+              </tr>
+              <tr>
+              <th colspan="2">Lower Section</th>
+              </tr>
+              <tr>
+              <td>Three-Of-A-Kind</td>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <td>Four-Of-A-Kind</td>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <td>Full House</td>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <td>Small Straight</td>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <td>Large Straight</td>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <td>Yahtzee</td>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <td>Chance</td>
+              <td class="score-cell"></td>
+              </tr>
+              <tr>
+              <th>Lower Section Total</th>
+              <td id="lowerTotal"></td>
+              </tr>
+              <tr>
+              <th>Grand Total</th>
+              <td id="grandTotal"></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    
+      
+      <div class="dice-section">
+        <div id="dice">
+        <div class="die" id="die1"><img src="images/dice1.png" alt="Die 1"></div>
+        <div class="die" id="die2"><img src="images/dice1.png" alt="Die 2"></div>
+        <div class="die" id="die3"><img src="images/dice1.png" alt="Die 3"></div>
+        <div class="die" id="die4"><img src="images/dice1.png" alt="Die 4"></div>
+        <div class="die" id="die5"><img src="images/dice1.png" alt="Die 5"></div>
+        </div>
+        <button id="rollButton">Roll Dice</button>
+      </div>
+    
+      <button id="startTurnButton">Start Turn</button>
+      <button id="endTurnButton">End Turn</button>
+<script src="script.js"></script>  
+  
+
+  
+</body>
+</html>
