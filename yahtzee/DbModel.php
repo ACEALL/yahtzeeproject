@@ -94,83 +94,22 @@ class DbModel{
         }
     }
 
-    
-    public function returnAllItems(){
-        $query = "SELECT itemName, category, itemDesc, price, onHand FROM items";		
-        $run = @mysqli_query ($this->dbc, $query);
-        $items = array();
-        while ($row = mysqli_fetch_array($run, MYSQLI_ASSOC)) {
-            $item = array(
-		        'itemName' =>$row['itemName'],
-		        'category' => $row['category'],
-                'itemDesc' => $row['itemDesc'],
-		        'price' => $row['price'],
-                'onHand' =>$row['onHand'],
-            );
-        array_push($items,$item);
-        } 
-        return $items;
+    public function saveScoreCard($id,$scoreCard){
+        $uId = mysqli_real_escape_string($this->dbc, trim($id));
+        $query = "INSERT INTO scoreCard (user_id, scoreCard) VALUES ('$uId', '$scoreCard' )";		
+		$run = @mysqli_query ($this->dbc, $query); 
+        return $run ? $run : mysqli_error($this->dbc);
+
     }
 
-    public function loadItemMangement($order_by, $start, $display){
-        $rows = [];
-        $query = "SELECT itemName, category, itemDesc, price, onHand, DATE_FORMAT(add_date, '%M %d, %Y') AS dr, item_id FROM items ORDER BY $order_by LIMIT $start, $display";		
-        $run = @mysqli_query ($this->dbc, $query); 
-        while ($row = mysqli_fetch_array($run, MYSQLI_ASSOC)) {
-            array_push($rows,$row);
-        }
-        mysqli_free_result ($run);
-        return $rows;
-    }
-
-    public function returnItem($id){
-        $query = "SELECT itemName,  category, itemDesc, price FROM items WHERE item_id=$id";		
-        $run = @mysqli_query ($this->dbc, $query);   
-        if (mysqli_num_rows($run) == 1) { 
-	    $row = mysqli_fetch_array ($run, MYSQLI_NUM);
-        }
-        return isset($row)? $row : null;
-    }
-    public function returnItemCount(){
-        $query = 'SELECT COUNT(item_id) FROM items';
-        $run = @mysqli_query ($this->dbc, $query);
+    public function getSave($id){
+        $uId = mysqli_real_escape_string($this->dbc, trim($id));
+        $query = "SELECT scoreCard FROM scoreCard WHERE user_id =$uId ORDER BY card_id DESC LIMIT 1;";
+		$run = @mysqli_query ($this->dbc, $query); 
         $row = @mysqli_fetch_array ($run, MYSQLI_NUM);
-        $records = $row[0];
-        mysqli_free_result ($run);
-        return $records;
+        return $row;
     }
 
-
-    public function addItem($n,$cat,$desc,$p,$onH){
-        $name = mysqli_real_escape_string($this->dbc, $n);
-        $category = mysqli_real_escape_string($this->dbc, $cat);
-        $descItem = mysqli_real_escape_string($this->dbc, $desc);
-        $price = mysqli_real_escape_string($this->dbc, $p);
-        $onHand = mysqli_real_escape_string($this->dbc, $onH);
-
-        $query = "INSERT INTO items ( itemName, category, itemDesc , price , onHand, add_Date) VALUES ('$name', '$category', '$descItem', '$price', '$onHand',  NOW() )";		
-		$run = @mysqli_query ($this->dbc, $query);
-        return $run;
-    }
-    public function updateItem($iN, $ids, $ca, $de, $p){
-        $itemName = mysqli_real_escape_string($this->dbc, $iN);
-        $id = mysqli_real_escape_string($this->dbc, $ids);
-        $des = mysqli_real_escape_string($this->dbc, $de);
-        $price = mysqli_real_escape_string($this->dbc, $p);
-        $cat = mysqli_real_escape_string($this->dbc, $ca);
-        $query = "SELECT item_id FROM items WHERE itemName='$itemName' AND item_id != $id";
-		$run = @mysqli_query($this->dbc, $query);
-		if (mysqli_num_rows($run) == 0) {
-			$query = "UPDATE items SET itemName='$itemName', category ='$cat', itemDesc='$des', price = '$price' WHERE item_id=$id LIMIT 1";
-			$run = @mysqli_query ($this->dbc, $query);
-			return mysqli_affected_rows($this->dbc);
-    }
-}
-    public function deleteItem($id){
-        $query = "DELETE FROM items WHERE item_id=$id LIMIT 1";		
-		$run = @mysqli_query ($this->dbc, $query);
-		return mysqli_affected_rows($this->dbc); 
-    }
     public function closeDB(){
         mysqli_close($this->dbc); 
     }

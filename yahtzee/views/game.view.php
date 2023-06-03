@@ -1,5 +1,6 @@
 <?php
 require_once('../controllers/game.controller.php');
+$controller = new gameController();
 if(!$_SESSION["logged_in"] ) $util->redirect_user('login.php');
 $page_title = 'GameSetup';
 include('./headers/indexHeader.php');
@@ -84,8 +85,10 @@ include('./headers/indexHeader.php');
               <td id="grandTotal"></td>
               </tr>
             </table>
+            <button id="zero">take Zero</button>
           </div>
         </div>
+    
       </div>
     
       
@@ -102,6 +105,13 @@ include('./headers/indexHeader.php');
       
       <div class="center"><button id="startTurnButton" class="buttons">Start Turn</button></div>
       <div class="center"><button id="endTurnButton" class="buttons">End Turn</button></div>
-    
-      
+      <form id="myForm" action="game.view.php" method="post">
+     <input type="hidden" name="type" value="end">
+        <button type="submit">End Game</button>
+</form>
+<?php
+include ('./footers/footer.html'); 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $controller->handleRequest();
+}?>     
 <script src="/yahtzee/js/script.js"></script>  

@@ -39,6 +39,17 @@ $page_title = 'GameSetup';
 <body>
     <h2>Game Setup</h2>
     <form method="POST">
+    <p>Do you want to load the last save?</p>
+        <label>
+            <input type="radio" name="save" value="true">
+            Yes
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="save" value="false">
+            No
+        </label>
+        <br>
         <label for="num_players">Number of Players (max <?php echo $controller->maxPlayers; ?>):</label>
         <select id="num_players" name="num_players" onchange="updatePlayerFields()">
             <?php

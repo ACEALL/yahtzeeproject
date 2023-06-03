@@ -1,24 +1,27 @@
   class Game {
     constructor() {
+      this.playerDone = [];
+       var saveDataFromCookie = this.getSaveDataFromCookie();
       var gameData = this.getGameDataFromCookie();
       if (gameData) {
-        var numPlayers = gameData.num_players;
+        this.numPlayers = gameData.num_players;
         var play= gameData.players;
-        console.log("Number of Players: " + numPlayers);
+        console.log("Number of Players: " + this.numPlayers);
         console.log("Player Names: " + play.join(", "));
       } else {
         console.log("Game data not found in the cookie.");
       }
         this.diceGame = new DiceGame();
         this.players = [];
-        for(let i = 0; i < numPlayers; i++){
-          if(i == 0){
-            let p = play[0].split('*');
-            this.players.push(new Player(p[0], p[1],this.diceGame));
+        for(let i = 0; i < this.numPlayers; i++){
+          if(i == this.numPlayers-1){
+            let p = play[this.numPlayers-1].split('*');
+            console.log("p =" + p);
+            this.players.push(new Player(p[0], p[1],this.diceGame,saveDataFromCookie));
           }
             else this.players.push(new Player(play[i], 'g' + i,this.diceGame));
         }
-      
+        document.getElementById("rollButton").classList.toggle("hide");
       this.currentPlayerIndex = 0;
     }
   
@@ -31,22 +34,56 @@
     }
 
     startTurn(){
+       if(!this.playerIsDone()){
+        document.getElementById("rollButton").classList.toggle("hide");
         this.players[this.currentPlayerIndex].takeTurn();
-	document.getElementById("rollButton").classList.toggle("show");
         document.getElementById("startTurnButton").classList.toggle("hide");
+    }
 
     }
 
-    endTurn(){
-       if( this.players[this.currentPlayerIndex].turnDone()){
-	document.getElementById("startTurnButton").classList.toggle("hide");
+    playerIsDone(){
+      if(this.players[this.currentPlayerIndex].pdone()){
+        if(!this.playerDone.includes(this.currentPlayerIndex)) this.playerDone.push(this.currentPlayerIndex);
+        if(this.numPlayers == this.playerDone.length) this.gameOver();
+        document.getElementById("startTurnButton").classList.toggle("hide");
         document.getElementById("rollButton").classList.toggle("show");
+        document.getElementById("endTurnButton").classList.toggle("hide");
+        alert(this.players[this.currentPlayerIndex].getName() + " Has Finished")
+        this.nextTurn();
+      }
+    }
+
+    endTurn(){
+      this.players[this.numPlayers-1].saveCard();
+       if( this.players[this.currentPlayerIndex].turnDone()){
+	      document.getElementById("startTurnButton").classList.toggle("hide");
+        document.getElementById("rollButton").classList.toggle("hide");
         document.getElementById("endTurnButton").classList.toggle("hide");
         this.nextTurn();
        }
        else{
         alert("player is not finished");
        }
+    }
+
+    gameOver(){
+      this.players[this.numPlayers-1].saveCard();
+      alert(this.findWinner());
+      document.getElementById("startTurnButton").classList.toggle("hide");
+      document.getElementById("rollButton").classList.toggle("hide");
+      document.getElementById("endTurnButton").classList.toggle("hide");
+    }
+    findWinner(){
+      let winner = 0;
+      let topScore = 0;
+      for(let x in this.players){
+        if(this.Player[x].getGrandTotal() > topScore ){
+          topScore =  this.Player[x].getGrandTotal();
+          winner = x;
+        }
+      }
+      return 'The Winner is' + this.players[winner].getName() + ' with a score of ' + topScore;
     }
     getGameDataFromCookie() {
       var gameDataCookie = document.cookie
@@ -62,19 +99,57 @@
     
       return null;
     }
+    getSaveDataFromCookie() {
+      var saveDataCookie = document.cookie
+        .split(';')
+        .map(cookie => cookie.trim())
+        .find(cookie => cookie.startsWith('save_data='));
+      if (saveDataCookie) {
+        var saveDataJson = decodeURIComponent(saveDataCookie.substring(10));
+        var saveData = JSON.parse(saveDataJson);
+        var data = JSON.stringify(saveData);
+        return data;
+      }
+    
+      return null;
+    }
   }
 
 
 class Player {
-    constructor(username,userId,gameDice) {
+    constructor(username,userId,gameDice, card = null) {
       this.userId = userId;
       this.username = username;
       this.diceGame = gameDice;
+      this.playerDone = false;
+      if(card != null){
+        this.scoreCard = card;
+      }
+      else{
       this.scoreCard = '[{"header0":"Upper Section"},{"header0":"Ones","header1":""},{"header0":"Twos","header1":""},{"header0":"Threes","header1":""},{"header0":"Fours","header1":""},{"header0":"Fives","header1":""},{"header0":"Sixes","header1":""},{"header0":"Upper Section Total","header1":""},{"header0":"Lower Section"},{"header0":"Three-Of-A-Kind","header1":""},{"header0":"Four-Of-A-Kind","header1":""},{"header0":"Full House","header1":""},{"header0":"Small Straight","header1":""},{"header0":"Large Straight","header1":""},{"header0":"Yahtzee","header1":""},{"header0":"Chance","header1":""},{"header0":"Lower Section Total","header1":""},{"header0":"Grand Total","header1":""}]';
+    }}
+    getName(){
+      return this.username;
+    }
+
+    saveCard(){
+      const json = this.scoreCard;
+      const cookieName = 'gameCard';
+      const cookieValue = encodeURIComponent(json);
+    document.cookie = `${cookieName}=${cookieValue};  path=/`;
+    }
+
+    pdone(){
+      return this.playerDone;
+    }
+    getGrandTotal() {
+      const grandTotalObj = this.scoreCard.find(obj => obj.header0 === "Grand Total");
+      const grandTotal = grandTotalObj.header1;   
+      return grandTotal;
     }
 
     takeTurn(){
-      alert(this.username)
+      alert(this.username + " Turn!")
         this.turnStatus = false;
          // Create a new dice game object for each player's turn
         this.diceGame.resetDice();
@@ -83,8 +158,8 @@ class Player {
      turnDone() {
         if(this.turn.over()){
             this.scoreCard=this.turn.tableToJson();
-            delete this.turn;
-            this.reloadDice();
+            if(this.turn.done()) this.playerDone = true;
+            delete this.turn;;
             this.diceGame.resetDice();
             return true;
         }
@@ -94,26 +169,18 @@ class Player {
     getScoreCard() {
       return this.scoreCard;
     }
-     reloadDice() {
-        //  var diceContainer = document.getElementById('dice');
-        // diceContainer.innerHTML = `
-        //     <div class="die" id="die1"><img src="images/dice1.png" alt="Die 1"></div>
-        //     <div class="die" id="die2"><img src="images/dice1.png" alt="Die 2"></div>
-        //     <div class="die" id="die3"><img src="images/dice1.png" alt="Die 3"></div>
-        //     <div class="die" id="die4"><img src="images/dice1.png" alt="Die 4"></div>
-        //     <div class="die" id="die5"><img src="images/dice1.png" alt="Die 5"></div>
-        //  `;
-    }
   }
   
 
   
   class Turn {
     constructor(scoreCard, diceGame) {
-        this.json = scoreCard;
-        //this.json =
-        console.log(this.tableToJson());
+      this.json = scoreCard;
+      this.gameOver = false;
+      this.skip = false;
+      console.log(this.tableToJson());
       this.cells = document.querySelectorAll(".score-cell");
+      this.zero = document.getElementById("zero");
       this.upperTotal = document.getElementById("upperTotal");
       this.lowerTotal = document.getElementById("lowerTotal");
       this.grandTotal = document.getElementById("grandTotal");
@@ -128,14 +195,23 @@ class Player {
           if (!cell.isFilled) {
             var score = 0;
             let rolledDice = this.dice.getSavedDice()
-            if (this.checkCategory(categoryName,rolledDice)) {
+            if(this.skip){
+              score = this.calculateScore(categoryName,0)
+              cell.textContent = score;
+              cell.isFilled = true;
+              this.skip = false;
+              console.log(this.tableToJson());
+              this.stat = true;
+	            document.getElementById("endTurnButton").classList.toggle("hide");
+            }
+            else if (this.checkCategory(categoryName,rolledDice)) {
               score = this.calculateScore(categoryName,rolledDice)
               cell.textContent = score;
               cell.isFilled = true;
               this.updateTotals();
               console.log(this.tableToJson());
               this.stat = true;
-	      document.getElementById("endTurnButton").classList.toggle("hide");
+	          document.getElementById("endTurnButton").classList.toggle("hide");
             }
             else{
                 alert("Invalid Selection");
@@ -145,6 +221,7 @@ class Player {
           }
         });
       });
+      this.zero.addEventListener("click", () => this.takeZero());
     }
   
     over(){
@@ -153,7 +230,12 @@ class Player {
         }
         return this.stat;
     }
+
+    done(){
+      return this.gameOver;
+    }
     updateTotals() {
+
       var upperScore = 0;
       var lowerScore = 0;
   
@@ -172,6 +254,7 @@ class Player {
       var allCellsFilled = Array.from(this.cells).every((cell) => cell.isFilled);
       if (allCellsFilled) {
         alert(`Game Over! Your total score is ${upperScore + lowerScore}`);
+        this.gameOver = true;
       }
     }
      checkCategory(category, dice) {
@@ -198,9 +281,9 @@ class Player {
             return frequencies[5] >= 1;
           case "Sixes":
             return frequencies[6] >= 1;
-          case "Three of a Kind":
+          case "Three-Of-A-Kind":
             return Object.values(frequencies).some(count => count >= 3);
-          case "Four of a Kind":
+          case "Four-Of-A-Kind":
             return Object.values(frequencies).some(count => count >= 4);
           case "Full House":
             return Object.values(frequencies).includes(2) && Object.values(frequencies).includes(3);
@@ -222,6 +305,9 @@ class Player {
 
       calculateScore(category, dice) {
         // Sort the dice values in ascending order
+        if(!Array.isArray(dice)){
+          return 0;
+        }
         dice.sort((a, b) => a - b);
       
         // Calculate the frequency of each value
@@ -244,10 +330,10 @@ class Player {
             return frequencies[5] * 5;
           case "Sixes":
             return frequencies[6] * 6;
-          case "Three of a Kind":
+          case "Three-Of-A-Kind":
             return Object.entries(frequencies).some(([value, count]) => count >= 3) ?
                    dice.reduce((acc, value) => acc + value, 0) : 0;
-          case "Four of a Kind":
+          case "Four-Of-A-Kind":
             return Object.entries(frequencies).some(([value, count]) => count >= 4) ?
                    dice.reduce((acc, value) => acc + value, 0) : 0;
           case "Full House":
@@ -268,7 +354,10 @@ class Player {
             return 0; // Invalid category
         }
       }
-
+      takeZero(){
+        this.skip = true;
+        alert("Select what area you want to zero");
+      }
       tableToJson() {
             // Get the table element
         var table = document.querySelector('table');

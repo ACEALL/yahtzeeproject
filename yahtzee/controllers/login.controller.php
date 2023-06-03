@@ -35,12 +35,14 @@ class loginController {
 	if ($check) {
 		$_SESSION["logged_in"]=true;
 		$_SESSION["userid"]=$data["user_id"];
+        $_SESSION['email'] = $_POST['email'];
 		$_SESSION["name"]=$data["first_name"];
 		$_SESSION["level"]=$data["permission_level"];
 		if($_SESSION["level"] == 2){
 			$this->util->redirect_user('../views/indexAdmin.php');	
 		}
-		$this->util->redirect_user('../views/gameSetup.views.php');	
+        else{
+		$this->util->redirect_user('../views/gameSetup.views.php');	}
 	} else { 
 		$_SESSION["logged_in"]=false;
 		$errors = $data;

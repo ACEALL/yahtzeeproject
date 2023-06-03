@@ -23,6 +23,9 @@ class gameController {
                     case 'setup':
                         $this->gameSetup();
                         break;
+                    case 'end':
+                        $this->endGame();
+                        break;
                 }
             }
         }
@@ -51,11 +54,34 @@ class gameController {
         } else {
             $numPlayers = 2;
         }
+        if(isset($_POST['save']) || $_POST['save'] = true){
+            $this->loadSaveGame();
+        }
         $this->util->redirect_user('../views/game.view.php');
     }
 
 private function startGame(){
 
 }
+
+private function endGame(){
+    $cookieName = 'gameCard';
+    if (isset($_COOKIE[$cookieName])) {
+      $json = urldecode($_COOKIE[$cookieName]);
+     $data = json_decode($json, true);
+     $this->db->saveScoreCard($_SESSION['userid'], json_encode($data));
+     $this->util->redirect_user('../views/index.php');
+} else {
+    echo 'Cookie not found.';
+}
+
+}
+
+private function loadSaveGame(){
+    $id = $_SESSION['userid'];
+    $json = $this->db->getSave($id);
+    setcookie('save_data', $json[0], time() + (1000), '/');
+}
+
 }
 ?>
