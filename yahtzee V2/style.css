@@ -1,0 +1,127 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #8bc4e0;
+}
+
+h1 {
+  font-family: 'Georgia', serif;
+  font-size: 40px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+p {
+  text-align: center;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  margin: auto;
+  height: auto;
+}
+
+.square-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+}
+
+.rounded-square {
+  width: 700px;
+  height: 500px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+
+.table-container {
+  position: absolute;
+  top: 27%;  /* adjust this value */
+  right: 18%; /* adjust this value */
+}
+
+.dice-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  
+  
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 3.5px;
+}
+
+th, td {
+  text-align: center;
+  background-color: white;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+#dice, #rollButton {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.die {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  margin: 10px;
+}
+
+.die img {
+  width: 100%;
+  height: auto; 
+}
+
+.kept {
+  border: 3px solid red;
+}
+
+#rollButton {
+  display: flex;
+  justify-content: center;
+  width: 100px;
+  height: 30px;
+  margin-right: 20px; 
+  margin-left: 50px;
+  background-color: #918f8f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#rollButton:hover {
+  background-color: #bbbebb;
+}
+
+td:nth-child(2) {
+  width: 50px;
+}
